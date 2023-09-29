@@ -49,7 +49,55 @@ app.post('/post-user', async (req, res) => {
             details: error.message  // This will give more specific details about the error
         });
     }
-})
+});
+
+app.put('/edit-user/:id', async (req, res) => {
+    try {
+        // Find the user by ID and update
+        const user = await User.findByIdAndUpdate(
+            req.params.id,          // User ID from the request URL
+            req.body,               // Data from the request body
+            { new: true }           // Option to return updated document. By default, findByIdAndUpdate returns the original.
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Send the updated user as the response
+        res.json({
+            message: "User updated successfully",
+            data: user
+        });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ error: 'Failed to update user' });
+    }
+});
+
+app.delete('/delete-user/:id', async (req, res) => {
+    try {
+        // Find the user by ID and delete
+        const user = await User.findByIdAndDelete(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Send a confirmation as the response
+        res.json({
+            message: "User deleted successfully"
+        });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
